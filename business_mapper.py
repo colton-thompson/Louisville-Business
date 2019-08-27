@@ -1,7 +1,7 @@
 import folium
 import pandas
 
-df_b = pandas.read_csv("businesses.csv")#, nrows = 100)
+df_b = pandas.read_csv("businesses.csv", nrows = 10)
 df_i = pandas.read_csv("inspections.csv")
 
 
@@ -38,34 +38,43 @@ print(df_i.head(n=10))
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 #map = folium.Map(location=[df['latitude'].mean(),df['longitude'].mean()],zoom_start= 13)
 
-business_id_List = []
+
 
 def getPopupInfo(name, address):
 	score = attachScore()
 	popup = name + "<br>Address: " + addy +"<br>Score: " + str(score)
 	return popup
 	
+#SCRAPE THIS IDEA
+'''
+business_id_List = []
 def attachScore():
-	for index in df_b['business_id']:
+	for index in df_i['business_id']:
+		print(index)
 		if (index not in business_id_List):
-			for index2 in df_i['business_id']:
+			print("not in")
+			for index2 in df_b['business_id']:
 				if (index == index2):
-					#print(df_i['score'])	
+					print("match")	
 					score = df_i['score']
 					business_id_List.append(index)
 					return score
 		else:
-			return -1;
-	
+			print("breaking")
+			return -1
+			'''
+#TODO
+#NEW IDEA: create a dictionary and map business id to respective values such as name and date of inspection
+#		   when displaying information, filter high to low, then display top result 
+
 fg = folium.FeatureGroup(name="Restuarants")
 for la,lo,name,addy in zip(df_b["latitude"],df_b["longitude"],df_b["name"], df_b["address"]):
 	try:
-	#scooter_fg.add_child(folium.CircleMarker(location=[la,lo], radius = 5, color = 'black', weight = 4, popup = "Scooter: " + bikeID))
-		fg.add_child(folium.Marker(location=[la,lo],popup=(folium.Popup(getPopupInfo(name, addy),max_width=150,min_height=200)),icon=folium.Icon(color="red", icon_color='white')))
+		fg.add_child(folium.Marker(location=[la,lo], popup=(folium.Popup(getPopupInfo(name, addy),max_width=150,min_height=200)), icon=folium.Icon(color="red", icon_color='white')))
 	except TypeError:
 		raise
 		
-df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('test.csv')
+#df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('test.csv')
 
 map.add_child(fg)
 
