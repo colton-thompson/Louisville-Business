@@ -3,14 +3,12 @@ import pandas as pd
 
 
 #df = pd.read_csv("ODP_New_Reg.csv")
-df = pd.read_csv("businesses.csv")
+df = pd.read_csv("dateTest.csv")
 
-for co in df:
-	
 
 newDateList = []
-'''
-for date in df[" Commence Date"]:
+
+for date in df["date"]:
 	year = str(date)
 	year = (year[0:4])
 
@@ -23,6 +21,7 @@ for date in df[" Commence Date"]:
 	newDate = year + "-" + month + "-" + day
 	newDateList.append(newDate)
 	
+df["date"] = newDateList
 	
-df = pd.DataFrame({'Date': newDateList, 'Business Name':df["Business Name"]})
-df.to_excel('businesses.xlsx')'''
+df = pd.DataFrame({'date': newDateList, 'business_id':df["business_id"]})
+df.to_excel('businesses.xlsx')
