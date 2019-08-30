@@ -32,6 +32,15 @@ def getPopupInfo(name, address):
 	#score = attachScore()
 	popup = name + "<br>Address: " + addy +"<br>Score: " + str(-1)
 	return popup
+	
+def assign_Inspection_Score():
+	dict_list = [] 
+	for bus_index in range(len(businessDict)):
+		for insp_index in range(len(inspectionDict)):
+			if (businessDict[bus_index]['business_id'] == inspectionDict[insp_index]['business_id']):
+				print("match found at " + str(businessDict[bus_index]['business_id']) + "\tScore: " + inspectionDict[insp_index]['score'] + "\tDate: " + inspectionDict[insp_index]['date'] )
+				
+		
 
 #read files
 df_b = pandas.read_csv("businesses.csv", nrows = 10)
@@ -54,10 +63,11 @@ print(df_i.head(n=10))
 businessDict = creat_Dict_from_CSV("businesses.csv")
 inspectionDict = creat_Dict_from_CSV("inspections.csv")
 
+assign_Inspection_Score()
+
 print('')
 print(businessDict[0]['business_id'])
 print(inspectionDict[0]['business_id'])
-
 
 #Folium Mapping Section
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
