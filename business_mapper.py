@@ -34,7 +34,7 @@ def getPopupInfo(name, address):
 	return popup
 	
 def assign_Inspection_Score():
-	dict_list = [] 
+	dict_list = []
 	for bus_index in range(len(businessDict)):
 		for insp_index in range(len(inspectionDict)):
 			if (businessDict[bus_index]['business_id'] == inspectionDict[insp_index]['business_id']):
@@ -63,7 +63,7 @@ print(df_i.head(n=10))
 businessDict = creat_Dict_from_CSV("businesses.csv")
 inspectionDict = creat_Dict_from_CSV("inspections.csv")
 
-assign_Inspection_Score()
+mergedDict = assign_Inspection_Score()
 
 print('')
 print(businessDict[0]['business_id'])
