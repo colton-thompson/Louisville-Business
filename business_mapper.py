@@ -4,20 +4,20 @@ import pprint
 import folium
 import pandas
 from datetime import date
+from colorama import Fore, Back, Style 
 
 def reformatDate(date):
 	date = str(date)
 	year = date[0:4]
 	month = date[4:6]
 	day = date[6:8]
-		
 	newDate = month + "/" + day + "/" + year 
 	return newDate
 
 def getDateFromOneYearAgo():
 	today = date.today()
 	d1 = today.strftime("%Y%m%d")
-	d1 = int(d1) - 10000
+	d1 = int(d1) - 10000 #10000 is the X location in 201X0000
 	return d1
 
 #read in file, return dictionary
@@ -28,21 +28,34 @@ def creat_Dict_from_CSV(f):
 		dict_list.append(line)
 	return dict_list
 	
+def getScoreColor(score):
+	if (float(score) >= 90):
+		num = (Fore.GREEN + score)
+	elif (float(score) >= 80):
+		num = (Fore.BLUE + score)
+	else:
+		num = (Fore.RED + score)
+	#print(Style.RESET_ALL)	
+	print(num)
+	return num
+	
+#TODO get colors to display correctly, currently return the numbers of the color and not the actual color8
+def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))	
+	
 def getPopupInfo(data):
-	#score = attachScore()
-	score = data['score']
 	date = reformatDate(data['date'])
-	popup = data['name'] + "<br>Address: " + data['address'] +"<br>Health Inspection Score: " + str(score) + " <br>Last Inspection: " + date
+	score = data['score']
+	#num = getScoreColor(score)
+	popup =  data['name']+ "<br><b>Address: </b>" + data['address'] +"<br><b>Health Inspection Score: </b>" + score + " <br><b>Last Inspection: </b>" + date
 	return popup
 	
-def assign_Inspection_Score():
+def merge_dictionaries():
 	dict_list = []
 	for bus_index in range(len(businessDict)):
 		for insp_index in range(len(inspectionDict)):
 			bus_id = businessDict[bus_index]['business_id']
 			ins_id = inspectionDict[insp_index]['business_id']
 			if (bus_id == ins_id):
-				#bus_id = businessDict[bus_index]['business_id']
 				name = businessDict[bus_index]['name']
 				address = businessDict[bus_index]['address']
 				score = inspectionDict[insp_index]['score']
@@ -83,7 +96,7 @@ filterDataFile_Inspections(df_i)
 #create dictionaries
 businessDict = creat_Dict_from_CSV("businesses copy.csv")
 inspectionDict = creat_Dict_from_CSV("inspections copy.csv")
-mergedDict = assign_Inspection_Score()
+mergedDict = merge_dictionaries()
 
 #Folium Mapping Section
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
@@ -95,7 +108,7 @@ for index in range(len(mergedDict)):
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
 
-	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175,min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
+	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
 	
 map.add_child(fg)
 
