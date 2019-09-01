@@ -3,6 +3,7 @@ import csv
 import pprint
 import folium
 import pandas
+from datetime import date
 
 def reformatDate(df):
 	newDateList = []
@@ -19,6 +20,13 @@ def reformatDate(df):
 		newDate = year + "-" + month + "-" + day
 		newDateList.append(newDate)
 	return newDateList
+
+def getDateFromOneYearAgo():
+	today = date.today()
+	d1 = today.strftime("%Y%m%d")
+	d1 = int(d1) - 10000
+	print("d1 =", d1)
+	return d1
 
 #read in file, return dictionary
 def creat_Dict_from_CSV(f):
@@ -58,7 +66,8 @@ def filterDataFile_Businesses(df_b):
 	df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('bus_test.csv')
 	
 def filterDataFile_Inspections(df_i):
-	df_i = df_i[df_i['date'] > 20190000]
+	compareDate = getDateFromOneYearAgo()
+	df_i = df_i[df_i['date'] > compareDate]
 	df_i = df_i.dropna(subset = ['score']) #filter out scores of 0, nan, ect.
 	df_i = df_i.sort_values("date", ascending = False)
 	#print(df_i.head(n=1000))
@@ -83,19 +92,15 @@ inspectionDict = creat_Dict_from_CSV("insp_test.csv")
 mergedDict = assign_Inspection_Score()
 #print(mergedDict)
 
-print(businessDict[0]['business_id'])
-print(inspectionDict[0]['business_id'])
-
-
 #Folium Mapping Section
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
-#map = folium.Map(location=[df['latitude'].mean(),df['longitude'].mean()],zoom_start= 13)
+#map = folium.Map(location=[df_b['latitude'].mean(),df_b['longitude'].mean()],zoom_start= 13)
 
 fg = folium.FeatureGroup(name="Restuarants")
 
 #TODO find a way to filter data better, rn multiple entries from inspection data
 for index in range(len(mergedDict)):
-	#print(mergedDict[index])
+	print(mergedDict[index])
 	name = mergedDict[index]['name']
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
