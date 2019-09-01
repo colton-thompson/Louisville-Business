@@ -58,7 +58,7 @@ def filterDataFile_Businesses(df_b):
 	df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('bus_test.csv')
 	
 def filterDataFile_Inspections(df_i):
-	df_i = df_i[df_i['date'] > 20160000]
+	df_i = df_i[df_i['date'] > 20190000]
 	df_i = df_i.dropna(subset = ['score']) #filter out scores of 0, nan, ect.
 	df_i = df_i.sort_values("date", ascending = False)
 	#print(df_i.head(n=1000))
@@ -92,14 +92,8 @@ map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 #map = folium.Map(location=[df['latitude'].mean(),df['longitude'].mean()],zoom_start= 13)
 
 fg = folium.FeatureGroup(name="Restuarants")
-'''
-for la,lo,name,addy in zip(df_b["latitude"],df_b["longitude"],df_b["name"], df_b["address"]):
-#for la,lo,name,addy in zip(businessDict["latitude"],businessDict["longitude"],businessDict["name"], businessDict["address"]):
-	try:
-		fg.add_child(folium.Marker(location=[la,lo], popup=(folium.Popup(getPopupInfo(name, addy),max_width=150,min_height=200)), icon=folium.Icon(color="red", icon_color='white')))
-	except TypeError:
-		raise
-'''
+
+#TODO find a way to filter data better, rn multiple entries from inspection data
 for index in range(len(mergedDict)):
 	#print(mergedDict[index])
 	name = mergedDict[index]['name']
