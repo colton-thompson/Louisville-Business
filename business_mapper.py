@@ -25,7 +25,7 @@ def getDateFromOneYearAgo():
 	today = date.today()
 	d1 = today.strftime("%Y%m%d")
 	d1 = int(d1) - 10000
-	print("d1 =", d1)
+	#print("d1 =", d1)
 	return d1
 
 #read in file, return dictionary
@@ -38,7 +38,7 @@ def creat_Dict_from_CSV(f):
 	
 def getPopupInfo(name, address, score):
 	#score = attachScore()
-	popup = name + "<br>Address: " + address +"<br>Score: " + str(score)
+	popup = name + "<br>Address: " + address +"<br>Health Inspection Score: " + str(score)
 	return popup
 	
 def assign_Inspection_Score():
@@ -98,15 +98,14 @@ map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 
 fg = folium.FeatureGroup(name="Restuarants")
 
-#TODO find a way to filter data better, rn multiple entries from inspection data
 for index in range(len(mergedDict)):
-	print(mergedDict[index])
+	#print(mergedDict[index])
 	name = mergedDict[index]['name']
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
 	address = mergedDict[index]['address']
 	score = mergedDict[index]['score']
-	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(name, address, score), max_width=150,min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
+	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(name, address, score), max_width=175,min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
 	
 map.add_child(fg)
 
