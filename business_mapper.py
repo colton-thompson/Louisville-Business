@@ -28,17 +28,26 @@ def creat_Dict_from_CSV(f):
 		dict_list.append(line)
 	return dict_list
 	
-def getPopupInfo(name, address):
+def getPopupInfo(name, address, score):
 	#score = attachScore()
-	popup = name + "<br>Address: " + addy +"<br>Score: " + str(-1)
+	popup = name + "<br>Address: " + address +"<br>Score: " + str(score)
 	return popup
 	
 def assign_Inspection_Score():
-	dict_list = {}
+	dict_list = []
 	for bus_index in range(len(businessDict)):
 		for insp_index in range(len(inspectionDict)):
-			if (businessDict[bus_index]['business_id'] == inspectionDict[insp_index]['business_id']):
-				print("match found at " + str(businessDict[bus_index]['business_id']) + "\tScore: " + inspectionDict[insp_index]['score'] + "\tDate: " + inspectionDict[insp_index]['date'] )
+			bus_id = businessDict[bus_index]['business_id']
+			ins_id = inspectionDict[insp_index]['business_id']
+			if (bus_id == ins_id):
+				#bus_id = businessDict[bus_index]['business_id']
+				name = businessDict[bus_index]['name']
+				address = businessDict[bus_index]['address']
+				score = inspectionDict[insp_index]['score']
+				lat = businessDict[bus_index]['latitude']
+				lon = businessDict[bus_index]['longitude']
+				dict_list.append({'business_id' : bus_id, 'name' : name, 'address' : address, 'score': score, 'latitude': lat, 'longitude': lon})
+	return dict_list
 				
 def filterDataFile_Businesses(df_b):
 	df_b = df_b[df_b['latitude']!=0.0]
@@ -68,11 +77,11 @@ filterDataFile_Businesses(df_b)
 filterDataFile_Inspections(df_i)
 
 #create dictionaries
-
 businessDict = creat_Dict_from_CSV("bus_test.csv")
 inspectionDict = creat_Dict_from_CSV("insp_test.csv")
 
 mergedDict = assign_Inspection_Score()
+#print(mergedDict)
 
 print(businessDict[0]['business_id'])
 print(inspectionDict[0]['business_id'])
@@ -83,12 +92,22 @@ map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 #map = folium.Map(location=[df['latitude'].mean(),df['longitude'].mean()],zoom_start= 13)
 
 fg = folium.FeatureGroup(name="Restuarants")
+'''
 for la,lo,name,addy in zip(df_b["latitude"],df_b["longitude"],df_b["name"], df_b["address"]):
 #for la,lo,name,addy in zip(businessDict["latitude"],businessDict["longitude"],businessDict["name"], businessDict["address"]):
 	try:
 		fg.add_child(folium.Marker(location=[la,lo], popup=(folium.Popup(getPopupInfo(name, addy),max_width=150,min_height=200)), icon=folium.Icon(color="red", icon_color='white')))
 	except TypeError:
 		raise
+'''
+for index in range(len(mergedDict)):
+	#print(mergedDict[index])
+	name = mergedDict[index]['name']
+	lat = mergedDict[index]['latitude']
+	lon = mergedDict[index]['longitude']
+	address = mergedDict[index]['address']
+	score = mergedDict[index]['score']
+	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(name, address, score), max_width=150,min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
 	
 map.add_child(fg)
 
