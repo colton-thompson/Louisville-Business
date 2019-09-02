@@ -46,8 +46,19 @@ def getPopupInfo(data):
 	date = reformatDate(data['date'])
 	score = data['score']
 	#num = getScoreColor(score)
-	popup =  data['name']+ "<br><b>Address: </b>" + data['address'] +"<br><b>Health Inspection Score: </b>" + score + " <br><b>Last Inspection: </b>" + date
+	popup =  data['name'] + "<br><b>Address: </b>" + data['address'] +"<br><b>Health Inspection Score: </b>" + score + " <br><b>Last Inspection: </b>" + date
 	return popup
+	
+def color(score): 
+	score = float(score)
+	if score >= 90.0: 
+		col = 'green'
+	elif score >= 80.0: 
+		col = 'blue'
+	else:
+		col='red'
+	print(str(score) + " : " + col)
+	return col 
 	
 def merge_dictionaries():
 	dict_list = []
@@ -78,7 +89,7 @@ def filterDataFile_Inspections(df_i):
 	compareDate = getDateFromOneYearAgo()
 	df_i = df_i[df_i['date'] > compareDate]
 	df_i = df_i.dropna(subset = ['score']) #filter out scores of 0, nan, ect.
-	df_i = df_i.sort_values("date", ascending = False)
+	df_i = df_i.sort_values("date", ascending = True)
 	df_i = pandas.DataFrame({'business_id': df_i["business_id"],'score': df_i["score"],'date': df_i["date"], 'description':df_i["description"], 'type':df_i["type"]}).to_csv('inspections copy.csv')
 				
 				
@@ -107,8 +118,9 @@ fg = folium.FeatureGroup(name="Restuarants")
 for index in range(len(mergedDict)):
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
+	score = mergedDict[index]['score']
 
-	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = "red", icon_color = "white")))
+	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = color(score), icon_color = "white")))
 	
 map.add_child(fg)
 
