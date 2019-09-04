@@ -1,8 +1,9 @@
 import sys
 import csv
 import pprint
-import folium
+import folium 
 import pandas
+import branca
 from datetime import date
 from colorama import Fore, Back, Style 
 
@@ -57,7 +58,7 @@ def color(score):
 		col = 'blue'
 	else:
 		col='red'
-	print(str(score) + " : " + col)
+	#print(str(score) + " : " + col)
 	return col 
 	
 def merge_dictionaries():
@@ -109,6 +110,32 @@ businessDict = creat_Dict_from_CSV("businesses copy.csv")
 inspectionDict = creat_Dict_from_CSV("inspections copy.csv")
 mergedDict = merge_dictionaries()
 
+
+def getHTML(data):
+	html="""
+		<h1> This is a big popup</h1><br>
+		With a few lines of code...
+		<p>
+		<code>
+			from numpy import *<br>
+			exp(-2*pi)
+		</code>
+		</p>
+		"""
+	
+	#TODO add in reformat name like we have for date
+	name = "<b>Name: </b>" + data['name'] 
+	address = "<br><b>Address: </b>" + data['address'] 
+#	<p style="color:blue;font-size:18px;">This is demo text</p> 
+	score = "<br><b>Score: </b>" + "<p style=" + "\"color: " + color(data['score']) +";display: inline;\">" + data['score'] +"</p>"
+#	score = "<br><b>Score: </b>" + data['score'] #working but black text
+	date = "<br><b>Last checked: </b>" + reformatDate(data['date'])
+	
+	details = name + address + score + date
+	return details
+			
+	
+
 #Folium Mapping Section
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 #map = folium.Map(location=[df_b['latitude'].mean(),df_b['longitude'].mean()],zoom_start= 13)
@@ -119,8 +146,17 @@ for index in range(len(mergedDict)):
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
 	score = mergedDict[index]['score']
-
-	fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = color(score), icon_color = "white")))
+	
+	#popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200) 	
+	
+	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]), width=175, height=200)
+	popup = folium.Popup(iframe, max_width=200)
+	
+	icon = folium.Icon(color = color(score), icon_color = "white")
+	#fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = color(score), icon_color = "white")))
+	
+	fg.add_child(folium.Marker(location = [lat,lon], popup = popup, icon = icon))
+	
 	
 map.add_child(fg)
 
