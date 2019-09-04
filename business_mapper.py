@@ -14,6 +14,8 @@ def reformatDate(date):
 	day = date[6:8]
 	newDate = month + "/" + day + "/" + year 
 	return newDate
+	
+#def reformatName(name):
 
 def getDateFromOneYearAgo():
 	today = date.today()
@@ -92,7 +94,18 @@ def filterDataFile_Inspections(df_i):
 	df_i = df_i.dropna(subset = ['score']) #filter out scores of 0, nan, ect.
 	df_i = df_i.sort_values("date", ascending = True)
 	df_i = pandas.DataFrame({'business_id': df_i["business_id"],'score': df_i["score"],'date': df_i["date"], 'description':df_i["description"], 'type':df_i["type"]}).to_csv('inspections copy.csv')
-				
+	
+def getHTML(data):
+	#TODO add in reformat name like we have for date
+	# Takes in variable and outputs string into an HTML format
+	# concat the strings and then return
+	name = "<b><p style= \"font-size: 13px; display: inline;\">Name: </b>" + data['name'] + "</p>" 
+	address = "<br><b><p style=\"font-size: 13px; display: inline;\">Address: </b>" + data['address'] + "</p>"
+	score = "<br><b><p style= \"font-size: 13px; display: inline;\">Score: </b><p style=\"color: " + color(data['score']) +";font-size: 13px; display: inline;\">" + data['score'] +"</p>"
+	date = "<br><b><p style=\"font-size: 13px; display: inline;\">Last checked: </b>" + reformatDate(data['date']) + "</p>"
+	
+	details = name + address + score + date
+	return details
 				
 # check if files are up to date otherwise update them
 # run this section first and save the filtered data as a new csv
@@ -110,32 +123,6 @@ businessDict = creat_Dict_from_CSV("businesses copy.csv")
 inspectionDict = creat_Dict_from_CSV("inspections copy.csv")
 mergedDict = merge_dictionaries()
 
-
-def getHTML(data):
-	html="""
-		<h1> This is a big popup</h1><br>
-		With a few lines of code...
-		<p>
-		<code>
-			from numpy import *<br>
-			exp(-2*pi)
-		</code>
-		</p>
-		"""
-	
-	#TODO add in reformat name like we have for date
-	name = "<b>Name: </b>" + data['name'] 
-	address = "<br><b>Address: </b>" + data['address'] 
-#	<p style="color:blue;font-size:18px;">This is demo text</p> 
-	score = "<br><b>Score: </b>" + "<p style=" + "\"color: " + color(data['score']) +";display: inline;\">" + data['score'] +"</p>"
-#	score = "<br><b>Score: </b>" + data['score'] #working but black text
-	date = "<br><b>Last checked: </b>" + reformatDate(data['date'])
-	
-	details = name + address + score + date
-	return details
-			
-	
-
 #Folium Mapping Section
 map = folium.Map(location=[38.217090,-85.742117],zoom_start= 13)
 #map = folium.Map(location=[df_b['latitude'].mean(),df_b['longitude'].mean()],zoom_start= 13)
@@ -149,8 +136,8 @@ for index in range(len(mergedDict)):
 	
 	#popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200) 	
 	
-	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]), width=175, height=200)
-	popup = folium.Popup(iframe, max_width=200)
+	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]), width=250, height=75)
+	popup = folium.Popup(iframe, max_width=250, min_height=200)
 	
 	icon = folium.Icon(color = color(score), icon_color = "white")
 	#fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = color(score), icon_color = "white")))
