@@ -8,6 +8,7 @@ from datetime import date
 from colorama import Fore, Back, Style 
 
 # TODO make dynamic html boxes based on size of input
+# TODO add in a web scraping capabilty to check for new files, if new file exists pull it
 
 def reformatDate(date):
 	date = str(date)
@@ -22,6 +23,7 @@ def reformatCaps(name):
 	newName = ""
 	# if first value is char, keep it uppercase, else return the symbol
 	# for any value after 1st, make it lowercase if it is char, else return the symbol
+	# string.lower() will ignore numerics and symbols
 	for index in nameList:
 		newName += (str(index[0:1]) + str(index[1:]).lower() + ' ')
 	return newName
