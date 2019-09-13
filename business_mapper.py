@@ -7,6 +7,8 @@ import branca
 from datetime import date
 from colorama import Fore, Back, Style 
 
+# TODO make dynamic html boxes based on size of input
+
 def reformatDate(date):
 	date = str(date)
 	year = date[0:4]
@@ -15,8 +17,15 @@ def reformatDate(date):
 	newDate = month + "/" + day + "/" + year 
 	return newDate
 	
-#def reformatName(name):
-
+def reformatCaps(name):
+	nameList = name.split()
+	newName = ""
+	# if first value is char, keep it uppercase, else return the symbol
+	# for any value after 1st, make it lowercase if it is char, else return the symbol
+	for index in nameList:
+		newName += (str(index[0:1]) + str(index[1:]).lower() + ' ')
+	return newName
+	
 def getDateFromOneYearAgo():
 	today = date.today()
 	d1 = today.strftime("%Y%m%d")
@@ -31,27 +40,7 @@ def creat_Dict_from_CSV(f):
 		dict_list.append(line)
 	return dict_list
 	
-def getScoreColor(score):
-	if (float(score) >= 90):
-		num = (Fore.GREEN + score)
-	elif (float(score) >= 80):
-		num = (Fore.BLUE + score)
-	else:
-		num = (Fore.RED + score)
-	#print(Style.RESET_ALL)	
-	print(num)
-	return num
-	
-#TODO get colors to display correctly, currently return the numbers of the color and not the actual color8
-def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))	
-	
-def getPopupInfo(data):
-	date = reformatDate(data['date'])
-	score = data['score']
-	#num = getScoreColor(score)
-	popup =  data['name'] + "<br><b>Address: </b>" + data['address'] +"<br><b>Health Inspection Score: </b>" + score + " <br><b>Last Inspection: </b>" + date
-	return popup
-	
+# check score to determine color 	
 def color(score): 
 	score = float(score)
 	if score >= 90.0: 
@@ -60,9 +49,9 @@ def color(score):
 		col = 'blue'
 	else:
 		col='red'
-	#print(str(score) + " : " + col)
 	return col 
-	
+
+# compare two dictionaries and merge necessary content into one
 def merge_dictionaries():
 	dict_list = []
 	for bus_index in range(len(businessDict)):
@@ -99,8 +88,8 @@ def getHTML(data):
 	#TODO add in reformat name like we have for date
 	# Takes in variable and outputs string into an HTML format
 	# concat the strings and then return
-	name = "<b><p style= \"font-size: 13px; display: inline;\">Name: </b>" + data['name'] + "</p>" 
-	address = "<br><b><p style=\"font-size: 13px; display: inline;\">Address: </b>" + data['address'] + "</p>"
+	name = "<b><p style= \"font-size: 13px; display: inline;\">Name: </b>" + reformatCaps(data['name']) + "</p>" 
+	address = "<br><b><p style=\"font-size: 13px; display: inline;\">Address: </b>" + reformatCaps(data['address']) + "</p>"
 	score = "<br><b><p style= \"font-size: 13px; display: inline;\">Score: </b><p style=\"color: " + color(data['score']) +";font-size: 13px; display: inline;\">" + data['score'] +"</p>"
 	date = "<br><b><p style=\"font-size: 13px; display: inline;\">Last checked: </b>" + reformatDate(data['date']) + "</p>"
 	
@@ -115,7 +104,6 @@ df_i = pandas.read_csv("inspections copy.csv")
 
 #filter data
 filterDataFile_Businesses(df_b)
-#df_i["date"] = reformatDate(df_i)
 filterDataFile_Inspections(df_i)
 
 #create dictionaries
@@ -134,14 +122,11 @@ for index in range(len(mergedDict)):
 	lon = mergedDict[index]['longitude']
 	score = mergedDict[index]['score']
 	
-	#popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200) 	
-	
+	#TODO consider function to change width based on size of the name input (considertion)
 	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]), width=250, height=75)
-	popup = folium.Popup(iframe, max_width=250, min_height=200)
 	
+	popup = folium.Popup(iframe, max_width=250, min_height=200)	
 	icon = folium.Icon(color = color(score), icon_color = "white")
-	#fg.add_child(folium.Marker(location = [lat,lon], popup = folium.Popup(getPopupInfo(mergedDict[index]), max_width=175, min_height=200), icon = folium.Icon(color = color(score), icon_color = "white")))
-	
 	fg.add_child(folium.Marker(location = [lat,lon], popup = popup, icon = icon))
 	
 	
