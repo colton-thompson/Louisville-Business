@@ -77,14 +77,14 @@ def filterDataFile_Businesses(df_b):
 	#df_b = df_b[df_b.phone_number.notnull()]
 	df_b = df_b.sort_values("business_id", ascending = True)
 	#print(df_b.head(n=10))
-	df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('businesses copy.csv')
+	df_b = pandas.DataFrame({'business_id': df_b["business_id"],'name': df_b["name"],'address': df_b["address"], 'city':df_b["city"], 'state':df_b["state"], 'postal_code':df_b["postal_code"], 'latitude':df_b["latitude"],'longitude':df_b["longitude"], 'phone_number':df_b["phone_number"]}).to_csv('businesses_filtered.csv')
 	
 def filterDataFile_Inspections(df_i):
 	compareDate = getDateFromOneYearAgo()
 	df_i = df_i[df_i['date'] > compareDate]
 	df_i = df_i.dropna(subset = ['score']) #filter out scores of 0, nan, ect.
 	df_i = df_i.sort_values("date", ascending = True)
-	df_i = pandas.DataFrame({'business_id': df_i["business_id"],'score': df_i["score"],'date': df_i["date"], 'description':df_i["description"], 'type':df_i["type"]}).to_csv('inspections copy.csv')
+	df_i = pandas.DataFrame({'business_id': df_i["business_id"],'score': df_i["score"],'date': df_i["date"], 'description':df_i["description"], 'type':df_i["type"]}).to_csv('inspections_filtered.csv')
 	
 def getHTML(data):
 	#TODO add in reformat name like we have for date
@@ -98,19 +98,30 @@ def getHTML(data):
 	details = name + address + score + date
 	return details
 				
+def getSizeForHTML(name):
+	length = len(name)
+	if (length < 10):
+		return 100
+	elif (length >= 10 & length < 15):
+		return 150
+	elif (length >= 15 & length < 20):
+		return 200
+	else:
+		return 250
+
 # check if files are up to date otherwise update them
 # run this section first and save the filtered data as a new csv
 # read files
-df_b = pandas.read_csv("businesses copy.csv")#, nrows = 10)
-df_i = pandas.read_csv("inspections copy.csv")
+df_b = pandas.read_csv("https://data.louisvilleky.gov/sites/default/files/businesses.csv")#, nrows = 10)
+df_i = pandas.read_csv("https://data.louisvilleky.gov/sites/default/files/inspections.csv")
 
 #filter data
 filterDataFile_Businesses(df_b)
 filterDataFile_Inspections(df_i)
 
 #create dictionaries
-businessDict = creat_Dict_from_CSV("businesses copy.csv")
-inspectionDict = creat_Dict_from_CSV("inspections copy.csv")
+businessDict = creat_Dict_from_CSV("businesses_filtered.csv")
+inspectionDict = creat_Dict_from_CSV("inspections_filtered.csv")
 mergedDict = merge_dictionaries()
 
 #Folium Mapping Section
@@ -123,11 +134,12 @@ for index in range(len(mergedDict)):
 	lat = mergedDict[index]['latitude']
 	lon = mergedDict[index]['longitude']
 	score = mergedDict[index]['score']
+	name = mergedDict[index]['name']
 	
 	#TODO consider function to change width based on size of the name input (considertion)
-	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]), width=250, height=75)
+	iframe = branca.element.IFrame(html = getHTML(mergedDict[index]),width = 250, height = 75)
 	
-	popup = folium.Popup(iframe, max_width=250, min_height=200)	
+	popup = folium.Popup(iframe)#, max_width=250, min_height=200)	
 	icon = folium.Icon(color = color(score), icon_color = "white")
 	fg.add_child(folium.Marker(location = [lat,lon], popup = popup, icon = icon))
 	
