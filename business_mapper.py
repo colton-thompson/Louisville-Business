@@ -1,3 +1,4 @@
+import os
 import sys
 import csv
 import pprint
@@ -109,6 +110,10 @@ def getSizeForHTML(name):
 	else:
 		return 250
 
+def deleteFile(fileName, deleteBool):
+	if ((os.path.exists(fileName)) & deleteBool):
+		os.remove(fileName)
+
 # check if files are up to date otherwise update them
 # run this section first and save the filtered data as a new csv
 # read files
@@ -143,7 +148,10 @@ for index in range(len(mergedDict)):
 	icon = folium.Icon(color = color(score), icon_color = "white")
 	fg.add_child(folium.Marker(location = [lat,lon], popup = popup, icon = icon))
 	
-	
+# remove file when true; false to save files
+deleteFile("businesses_filtered.csv", True)
+deleteFile("inspections_filtered.csv", True)
+
 map.add_child(fg)
 
 map.add_child(folium.LayerControl())
